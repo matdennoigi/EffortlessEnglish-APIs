@@ -1,0 +1,171 @@
+<html>
+	<head>
+		<!--<link rel="stylesheet" type="text/css" href="ui-bootstrap-custom-0.13.4-csp.css">
+		<script type="text/javascript" src="libs/angular.min.js"></script>
+		<script type="text/javascript" src="angular-animate.min.js"></script>-->
+		<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.4.5/angular.js"></script>
+    	<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.4.5/angular-animate.js"></script>
+    	<script src="//angular-ui.github.io/bootstrap/ui-bootstrap-tpls-0.13.4.js"></script>
+		<script type="text/javascript" src="core.js"></script>
+		
+		<script type="text/javascript" src="angular-pagedown.js"></script>
+		<script src="Markdown.Converter.js"></script>
+    	<script src="Markdown.Sanitizer.js"></script>
+    	<script src="Markdown.Extra.js"></script>
+    	<script src="Markdown.Editor.js"></script>
+
+		<link rel="stylesheet" type="text/css" href="angular-pagedown.css">
+	    <link href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" rel="stylesheet">
+	    <link rel="stylesheet" type="text/css" href="style.css">
+
+		<!--<script type="text/javascript" src="ui-bootstrap-custom-tpls-0.13.4.js"></script>-->
+	</head>
+
+	<body ng-app="effortlessenglish">
+		<h1 class="page-title">Effortless English CMS</h1>
+		
+    
+		<!-- Create CD Modal-->
+		<script type="text/ng-template" id="createCDModal.html">
+			<div class="modal-header">
+				<h4>Create CD</h4>
+			</div>
+
+			<div class="modal-body">
+				<form class="form-horizontal" role="form">
+					<div class="form-group">
+						<label class="col-sm-2 control-label">CD Title</label>
+						<div class="col-sm-10">
+							<input class="form-control" type="text" placeholder="Input CD Title ..."
+							ng-model="createCDForm.title"/>
+						</div>
+					</div>
+				</form>
+			</div>
+
+			<div class="modal-footer">
+				<button class="btn btn-primary" ng-click="create(createCDForm)">Create</button>
+				<button class="btn btn-default" ng-click="cancel()">Cancel</button>
+			</div>
+		</script>
+
+		<!-- Create Lesson Modal -->
+		<script type="text/ng-template" id="createLessonModal.html">
+			<div class="modal-header">
+				<h4>Tạo bài học</h4>
+			</div>
+
+			<div class="modal-body">
+				<form class="form-horizontal" role="form">
+					<div class="form-group">
+						<label class="col-sm-3 control-label">Lesson Title</label>
+						<div class="col-sm-9">
+							<input class="form-control" type="text" placeholder="Input Lesson Title ..."
+							ng-model="createLessonForm.title"/>
+						</div>
+					</div>
+				</form>
+			</div>
+
+			<div class="modal-footer">
+				<button class="btn btn-primary" ng-click="create(createLessonForm)">Tạo</button>
+				<button class="btn" ng-click="cancel()">Thoát</button>
+			</div>
+		</script>
+
+		<!-- Confirm CD dialog -->
+		<script type="text/ng-template" id="confirmDeleteCDModal.html">
+			<div class="modal-header">
+				<h4>Delete CD</h4>
+			</div>
+			<div class="modal-body">
+				Do you want to delete this CD?
+			</div>
+			<div class="modal-footer">
+				<button class="btn btn-danger pull-center" ng-click="yes()">Yes</button>
+				<button class="btn btn-default publl-center">No</button>
+			</div>
+		</script>
+
+		<!-- Create Lesson Section modal -->
+		<script type="text/ng-template" id="createLessonSectionModal.html">
+			<div class="modal-header">
+				<h4>Create Lesson Section</h4>
+			</div>
+			<div class="modal-body">
+				<form role="form">
+					<div class="form-group">
+						<label>Section Type:</label>
+						<div class="btn-group" dropdown>
+							<button id="split-button" type="button" class="btn btn-default">{{seclectedSectionType}}</button>
+
+							<button type="button" class="btn btn-default" dropdown-toggle>
+								<span class="caret"></span>
+								<span class="sr-only">Split button!</span>
+							</button>
+
+							<ul class="dropdown-menu" role="menu" aria-labelledby="split-button">
+								<li role="menuitem" ng-repeat="sectionType in sectionTypes">
+									<a href="#" ng-click="sectionTypeSelected(sectionType)">{{sectionType}}</a>
+								</li>
+							</ul>
+						</div>
+					</div>
+
+					<div class="form-group">
+						<label>Text Content:</label>
+						<pagedown-editor insert-image="insertImage()" content="createLessonSectionForm.textContent"></pagedown-editor>
+					</div>
+				</form>
+			</div>
+			<div class="modal-footer">
+				<button class="btn btn-primary" ng-click="create(createLessonSectionForm)">Create</button>
+				<button class="btn btn-default" ng-click="cancel()">Cancel</button>
+			</div>
+		</script>
+
+
+		<!-- Page's Content -->
+		<div ng-controller="cdcontroller"> 
+			<button type="button" class="btn" ng-click="openCreateCDModal()">Create CD</button> 
+
+			<accordion close-others="false">
+				<accordion-group ng-repeat="cd in cds">
+					<accordion-heading>
+						<div class="row center-block center-vertical">
+							<b style="vertical-algin:middle;">{{cd.title}}<b/>
+							<button type="button" class="btn btn-danger pull-right" style="margin: 5 5 5 5;" ng-click="openDeleteCDModal($event, cd)">Delete CD</button>
+							<button tyype="button" class="btn btn-warning pull-right" style="margin: 5 5 5 5;">Edit CD</button>
+							<button type="button" class="btn btn-primary pull-right" ng-controller="lessonController" ng-click="openCreateLessonModal($event, cd)" style="margin: 5 0 5 0;">Create Lesson</button>
+						</div>
+					</accordion-heading>
+					
+					<div>
+						<div class="panel panel-info" ng-repeat="lesson in cd.lessons">
+							<div class="panel-heading">
+								<b>{{lesson.title}}</b>
+								<button class="btn btn-xs btn-danger pull-right" style="margin: 5 5 5 5;"><span class="glyphicon glyphicon-trash"></span></button>
+								<button class="btn btn-xs btn-warning pull-right" style="margin: 5 5 5 5;"><span class="glyphicon glyphicon-pencil"></span></button>
+								<button class="btn btn-xs btn-primary pull-right" style="margin: 5 5 5 5;"
+									ng-controller="lessonSectionController"
+									ng-click="openCreateLessonSectionModal($event)"><span class="glyphicon glyphicon-plus-sign"></span>
+								</button>
+							</div>
+							
+							<ul class="list-group">
+								<li class="list-group-item" ng-repeat="section in lesson.sections">{{section.type}}
+									<div class="pull-right">
+										<button class="btn btn-xs btn-warning" style="margin: 5 5 5 5;"><span class="glyphicon glyphicon-pencil"></span></button>
+										<button class="btn btn-xs btn-danger" style="margin: 5 5 5 5;"><span class="glyphicon glyphicon-trash"></span></button>
+									</div>
+								</li>
+							</ul>
+						</div>
+					</div>
+				</accordion-group>
+			</accordion>
+
+
+		</div>
+	</body>
+<html>
